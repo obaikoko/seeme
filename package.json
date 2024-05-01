@@ -1,0 +1,11 @@
+{
+  "name": "seeme",
+  "version": "1.0.0",
+  "description": "Walkie-Talkie App",
+  "main": "server.js",
+  "scripts": {
+    "test": "echo \"Error: no test specified\" && exit 1"
+  },
+  "author": "Learnable Group 7",
+  "license": "MIT"
+}
