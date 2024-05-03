@@ -1,6 +1,8 @@
 import asyncHandler from 'express-async-handler';
 import User from '../model/userModel.js';
 import generateToken from '../utils/generateToken.js';
+import nodemailer from 'nodemailer';
+import bcrypt from 'bcryptjs';
 // @desc Auth user/set token
 // @route POST api/users/auth
 // @access public
@@ -109,10 +111,118 @@ const updateUserProfile = asyncHandler(async (req, res) => {
   }
 });
 
+// @desc POST update Password
+// @privacy public
+// @route POST /api/users/resetPassword
+
+const resetPassword = asyncHandler(async (req, res) => {
+  const { email } = req.body;
+  const user = await User.findOne({ email });
+
+  if (!user) {
+    res.status(404);
+    throw new Error(`No account found for ${email} `);
+  } else {
+    const sixDigitNumber = generateSixDigitNumber();
+    const expirationTime = new Date(Date.now() + 120000);
+
+    user.resetNumber = sixDigitNumber;
+    user.resetNumberExpires = expirationTime;
+    await user.save();
+
+    try {
+      const transporter = nodemailer.createTransport({
+        service: 'Gmail',
+        auth: {
+          user: process.env.GMAILEMAIL,
+          pass: process.env.GMAILPASSWORD,
+        },
+        tls: {
+          rejectUnauthorized: true,
+        },
+      });
+
+      const mailOptions = {
+        from: 'SeeMe',
+        to: email,
+        subject: 'PASSWORD RESET',
+        text: `Here is your OTP which expires on ${expirationTime}: ${sixDigitNumber}`,
+      };
+
+      await transporter.sendMail(mailOptions);
+
+      res.status(200).json({ message: `Email sent successfully! to ${email}` });
+    } catch (error) {
+      console.error(error);
+      res.status(500);
+      throw new Error('Email could not be sent.');
+    }
+  }
+
+  function generateSixDigitNumber() {
+    const min = 100000; // Minimum 6-digit number
+    const max = 999999; // Maximum 6-digit number
+    return Math.floor(Math.random() * (max - min + 1)) + min;
+  }
+});
+
+// @desc PUT update Password
+// @privacy public
+// @route POST /api/users/resetPassword
+const verifyResetPassword = asyncHandler(async (req, res) => {
+  const { email, otp, newPassword } = req.body;
+  const user = await User.findOne({ email });
+  const minLength = 8;
+  const hasUppercase = /[A-Z]/.test(newPassword);
+  const hasLowercase = /[a-z]/.test(newPassword);
+  const hasDigit = /\d/.test(newPassword);
+  const hasSpecialChar = /[!@#$%^&*()_+{}\[\]:;<>,.?~\\-]/.test(newPassword);
+
+  if (!user) {
+    res.status(404);
+    throw new Error(`No account found for ${email}`);
+  }
+
+  if (user.resetNumber !== otp) {
+    res.status(400);
+    throw new Error('Invalid OTP');
+  }
+
+  if (user.resetNumberExpires < new Date()) {
+    res.status(400);
+    throw new Error('OTP has expired');
+  }
+
+  if (
+    newPassword.length < minLength ||
+    !hasUppercase ||
+    !hasLowercase ||
+    !hasDigit ||
+    !hasSpecialChar
+  ) {
+    res.status(400);
+    throw new Error(
+      'Password must be at least 8 characters long and contain at least one uppercase letter, one lowercase letter, one digit, and one special character.'
+    );
+  }
+
+  user.password = newPassword;
+
+  user.resetNumber = '';
+  user.resetNumberExpires = '';
+
+  await user.save();
+  generateToken(res, user._id);
+  res.status(200);
+  res.json({ message: 'Password reset successful' });
+});
+
 export {
   authUser,
   registerUser,
   logoutUser,
   getUserProfile,
   updateUserProfile,
+  resetPassword,
+  verifyResetPassword,
 };

@@ -16,6 +16,12 @@ const userSchema = mongoose.Schema(
       type: String,
       required: true,
     },
+    resetNumber: {
+      type: String,
+    },
+    resetNumberExpires: {
+      type: Date,
+    },
     friends: [
       {
         type: mongoose.Schema.Types.ObjectId,
