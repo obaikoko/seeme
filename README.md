@@ -1,4 +1,5 @@
 *INTRODUCTION*
+
 SeeMe is a lightweight social app that allows face-to-face communication amongst friends through audio and video means, that gets one talking in seconds. 
 Due to lack of spontaneity of real time connection, often disruption on text and calls workflow, and scheduling of traditional video calls in existing
 social media interaction, SeeMe walkie-talkie app will help users connect with close friends of their choice and give a smooth flow connections and also maintaining 
