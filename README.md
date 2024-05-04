@@ -5,80 +5,54 @@ SeeMe
 ## Table of Contents
 
 - [Introduction](#introduction)
-- [Features](#features)
 - [Getting Started](#getting-started)
+- [API Endpoints](#API-endpoints)
+  
 
 ## Introduction
 
-SeeMe is a lightweight social app that allows for face-to-face communication amongst friends through audio and video means, you get talking in seconds. Due to lack of spontaneity of real time connection, often disruption on text and calls workflow, and scheduling of traditional video calls in existing
-social media interaction, SeeMe walkie-talkie app will help users connect with close friends of their choice and give a smooth flow connections and also maintaining 
-the users privacySCOPE: This develops user-friendly web application inspired by TenTen, but with a video chat functionality. SeeMe-walkie-talkie app will allow close 
-friends to connect for quick face-to-face interactions without storing videos and audio.
-
-## Features
-
-SeeMe provide the following functionalites:
-
-- compatibility - connect with friends with any device you get in touch with.
-- low memory footprint - your videos and audio are not stored, so memory usage is low.
-- in chat features
-- real-time communication
-- voice option
-- call mode - for longer conversatioin.
-- privacy - your audio and video are not stored. We prioritize your privacy.
-- friend management - manage a list of close friends providing more secure connection.
-
-### Future features
-
-- group calls
-- quick reaction (emojis)
-- customization notification
+SeeMe is a lightweight social app designed to facilitate face-to-face communication among friends through audio and video means, enabling quick connections. Addressing the challenges of real-time communication spontaneity, disruptions in text and call workflows, and the scheduling constraints of traditional video calls that existed in other social media platforms. This app aims to provide users with seamless connections with their chosen close friends while prioritizing user privacy. SeeMe utilizes the mongoose library to interact with a MongoDB database.
 
 ## Getting Started
 
-Let's get to know more about the project structure and the specifics of each. So the folder structure for this project follows the MVC (Model-View-Controller) pattern with some added customizations.
+1. Installation
+   . Clone the repository: `git clone https://github.com/obaikoko/seeme/your-repo.git`
+   . Install dependencies: `npm install`
 
-Model - This describes the schema(data model) of the entities that make up the project, in this case our models include:
+2. Configuration
+    . Set up MongoDB connection details in a `.env` file.
+    . Configure server settings and environment variables in the `./config/db.js` file. 
 
-- chat
-- friendRequest
-- user
+3. Running the Application
+   . Start the server: `npm start`
+   . Access the API endpoints locally: `http://localhost:5000`
 
-The model gives us a clear picture of how our entities will be stored in the database, it tells us the data-type of a particular field.
+### Folder Structure
+ . config: Contains configuration files for database connection and server settings.
+ . controllers: Houses logic for handling user actions, chat functionalities, and notifications.
+ . middleware: Includes authentication, error handling, and logging middleware.
+ . models: Defines schemas for user data, chat sessions, and notifications.
+ . routes: Defines API endpoints for user management and chat functionalities.
+ . utils: Contains utility functions for validation, responses, and authentication.
 
-View - This describes the apperance of the complete application our user interact with (This is the section the front-end developer handles).
+## API Endpoints
+ . GET /users: Retrieve a list of users.
+ . POST /users/register: Register a new user.
+ . POST /users/login: Authenticate a user and generate a JWT token.
+ . PUT /users/profile: Update user profile information.
+ . DELETE /users/:id: Delete a user account.
 
-Controller - This is where the business logic takes place.
+Technologies Used
+ . Node.js: Backend JavaScript runtime environment.
+ . Express.js: Web application framework for Node.js.
+ . MongoDB: NoSQL database for storing user and chat data.
+ . Mongoose: ODM library for MongoDB interactions.
+ . JWT: JSON Web Tokens for user authentication and authorization.
 
-Config - This folder holds configuration files that our project depends on.
+Development Guidelines
+ . Follow RESTful API design principles for clear and consistent endpoints.
+ . Implement error handling to provide informative responses to clients.
+ . Secure API endpoints with authentication and authorization mechanisms.
+ . Test API endpoints using tools like Postman or automated testing frameworks.
 
-Env-samples - This file holds data that should be private. Data like:
-
-- token secrets
-- database password
-- database connection string
-- session secrets
-
-Utils - This is a folder that holds custom user helper libraries that is used during the project. They are written to facilitate some task. In this project our helper library is the generateToken function, as the name implies, this function helps us to generate a token based on the argument passed to it.
-
-Package.json, Package.lock.json - a project would be incomplete without a package manager. The package.json holds metadata about our project. Metadata like our project entry file, project version number, installed dependencies, author(the creator of the project) etc. The package.lock.json on the other end holds a complete hierarchy of our dependency tree including their specific version number. Both files help us to achieve consistent project environment when other developers contribute to our project.
-
-Server.js - This is the project entry file. This is the file that is run to start up the application.
-
-Routes - This folder holds the files that in some way describes the features of our application have. Various user interaction with our application our routed to these files. The route to a specific file are determined by some parameters.
-
-Middlewares - The name give it out. This folder contain files that are executed before a specific route to a file is hit. The files can be used to implement different functionality. Authentication are integrated using this approach.
-
-I hope we were able to get you started.
-
-Let's take you from Getting Started to communicating with friends - SeeMe.
-
-
-
-
-
-
-
-
-
-
+  Let's take you from Getting Started to communicating with friends - SeeMe.
