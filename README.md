@@ -36,11 +36,11 @@ SeeMe is a lightweight social app designed to facilitate face-to-face communicat
  . utils: Contains utility functions for validation, responses, and authentication.
 
 ## API Endpoints
- . GET /users: Retrieve a list of users.
+
  . POST /users/register: Register a new user.
- . POST /users/login: Authenticate a user and generate a JWT token.
- . PUT /users/profile: Update user profile information.
- . DELETE /users/:id: Delete a user account.
+ . POST /api/users/auth: Authenticate a user and generate a JWT token.
+ . PUT api/users/profile: Update user profile information.
+
 
 Technologies Used
  . Node.js: Backend JavaScript runtime environment.
