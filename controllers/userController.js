@@ -1,8 +1,7 @@
 import asyncHandler from 'express-async-handler';
 import User from '../model/userModel.js';
 import generateToken from '../utils/generateToken.js';
-import nodemailer from 'nodemailer';
-import bcrypt from 'bcryptjs';
+import sendMail from '../utils/sendMail.js';
 // @desc Auth user/set token
 // @route POST api/users/auth
 // @access public
@@ -86,28 +85,82 @@ const getUserProfile = asyncHandler(async (req, res) => {
 // @route PUT api/users/profile
 // @access Private
 const updateUserProfile = asyncHandler(async (req, res) => {
-  const { username, email } = req.body;
+  const { username, email, password } = req.body;
   const user = await User.findById(req.user._id);
+  const sixDigitNumber = generateSixDigitNumber();
+  const expirationTime = new Date(Date.now() + 60 * 10 * 1000);
+  const currentTime = new Date();
+  const timeDifferenceInMilliseconds = expirationTime - currentTime;
+  const timeDifferenceInMinutes = Math.ceil(
+    timeDifferenceInMilliseconds / (1000 * 60)
+  );
 
-  if (user) {
+  user.resetNumber = sixDigitNumber;
+  user.resetNumberExpires = expirationTime;
+  await user.save();
+
+  if (!user) {
+    res.status(404);
+    throw new Error('User Not Found');
+  }
+
+  if (username && !email && !password) {
     user.username = username || user.username;
-    user.email = email || user.email;
-
-    if (req.body.password) {
-      user.password = req.body.password || user.password;
-    }
-
     const updatedUser = await user.save();
-
     res.status(200);
     res.json({
       _id: updatedUser._id,
       username: updatedUser.username,
       email: updatedUser.email,
     });
-  } else {
-    res.status(404);
-    throw new Error('User Not Found');
+  }
+
+  if (email && !password) {
+    const subject = 'REQUEST FOR CHANGE OF EMAIL';
+    const text = `A request has been made to change email address from ${user.email} to ${email} if you did not request for the change ignore else here is your on time password ${sixDigitNumber} which expires in ${timeDifferenceInMinutes} minutes `;
+
+    try {
+      await sendMail(user.email, subject, text);
+      res.status(200);
+      res.json({ message: `Email sent successfully! to ${email}` });
+    } catch (error) {
+      res.status(500);
+      throw new Error('Email could not be sent.');
+    }
+  }
+
+  if (!email && password) {
+    const subject = 'REQUEST FOR CHANGE OF PASSWORD';
+    const text = `A request for change of password has been made, if you did not request for the change ignore else here is your on time password ${sixDigitNumber} which expires in ${timeDifferenceInMinutes} minutes `;
+
+    try {
+      await sendMail(user.email, subject, text);
+      res.status(200);
+      res.json({ message: `Email sent successfully! to ${email}` });
+    } catch (error) {
+      res.status(500);
+      throw new Error('Email could not be sent.');
+    }
+  }
+
+  if (email && password) {
+    const subject = 'REQUEST FOR CHANGE OF EMAIL AND PASSWORD';
+    const text = `A request for change of email from ${user.email} to ${email}  and change of password has been made,  if you did not request for the change ignore else here is your on time password ${sixDigitNumber} which expires in ${timeDifferenceInMinutes} minutes `;
+
+    try {
+      await sendMail(user.email, subject, text);
+      res.status(200);
+      res.json({ message: `Email sent successfully! to ${email}` });
+    } catch (error) {
+      res.status(500);
+      throw new Error('Email could not be sent.');
+    }
+  }
+
+  function generateSixDigitNumber() {
+    const min = 100000; // Minimum 6-digit number
+    const max = 999999; // Maximum 6-digit number
+    return Math.floor(Math.random() * (max - min + 1)) + min;
   }
 });
 
@@ -124,36 +177,24 @@ const resetPassword = asyncHandler(async (req, res) => {
     throw new Error(`No account found for ${email} `);
   } else {
     const sixDigitNumber = generateSixDigitNumber();
-    const expirationTime = new Date(Date.now() + 120000);
+    const expirationTime = new Date(Date.now() + 60 * 3 * 1000);
+    const currentTime = new Date();
+    const timeDifferenceInMilliseconds = expirationTime - currentTime;
+    const timeDifferenceInMinutes = Math.ceil(
+      timeDifferenceInMilliseconds / (1000 * 60)
+    );
 
     user.resetNumber = sixDigitNumber;
     user.resetNumberExpires = expirationTime;
     await user.save();
 
+    const subject = 'PASSWORD RESET';
+    const text = `Here is your OTP which expires in ${timeDifferenceInMinutes} minutes: ${sixDigitNumber}`;
+
     try {
-      const transporter = nodemailer.createTransport({
-        service: 'Gmail',
-        auth: {
-          user: process.env.GMAILEMAIL,
-          pass: process.env.GMAILPASSWORD,
-        },
-        tls: {
-          rejectUnauthorized: true,
-        },
-      });
-
-      const mailOptions = {
-        from: 'SeeMe',
-        to: email,
-        subject: 'PASSWORD RESET',
-        text: `Here is your OTP which expires on ${expirationTime}: ${sixDigitNumber}`,
-      };
-
-      await transporter.sendMail(mailOptions);
-
+      await sendMail(email, subject, text);
       res.status(200).json({ message: `Email sent successfully! to ${email}` });
     } catch (error) {
-      console.error(error);
       res.status(500);
       throw new Error('Email could not be sent.');
     }
@@ -170,7 +211,7 @@ const resetPassword = asyncHandler(async (req, res) => {
 // @privacy public
 // @route POST /api/users/resetPassword
 const verifyResetPassword = asyncHandler(async (req, res) => {
-  const { email, otp, newPassword } = req.body;
+  const { email, newEmail, otp, newPassword } = req.body;
   const user = await User.findOne({ email });
   const minLength = 8;
   const hasUppercase = /[A-Z]/.test(newPassword);
@@ -206,7 +247,8 @@ const verifyResetPassword = asyncHandler(async (req, res) => {
     );
   }
 
-  user.password = newPassword;
+  user.password = newPassword || user.password;
+  user.email = newEmail || user.email;
 
   user.resetNumber = '';
   user.resetNumberExpires = '';
@@ -214,7 +256,7 @@ const verifyResetPassword = asyncHandler(async (req, res) => {
   await user.save();
   generateToken(res, user._id);
   res.status(200);
-  res.json({ message: 'Password reset successful' });
+  res.json({ message: 'Profile updated successfully' });
 });
 
 export {

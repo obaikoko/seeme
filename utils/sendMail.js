@@ -1,34 +1,32 @@
-import nodemailer from 'nodemailer'
+import nodemailer from 'nodemailer';
+import asyncHandler from 'express-async-handler';
 
-const transporter = nodemailer.createTransport({
-  service: 'gmail',
-  auth: {
-    user: 'your_email@gmail.com',
-    pass: 'your_password',
-  },
-});
+const sendMail = async (email, subject, text) => {
+  try {
+    const transporter = nodemailer.createTransport({
+      service: 'Gmail',
+      auth: {
+        user: process.env.GMAILEMAIL,
+        pass: process.env.GMAILPASSWORD,
+      },
+      tls: {
+        rejectUnauthorized: true,
+      },
+    });
 
-
-// Generate random token
-function generateToken() {
-    return crypto.randomBytes(20).toString('hex');
-}
-
-// Send verification email
-function sendVerificationEmail(email, token) {
-    const verificationLink = `http://yourwebsite.com/verify?token=${token}`;
     const mailOptions = {
-        from: 'your_email@gmail.com',
-        to: email,
-        subject: 'Verify Your Email',
-        html: `Click <a href="${verificationLink}">here</a> to verify your email address.`
+      from: 'SeeMe',
+      to: email,
+      subject: subject,
+      text: text,
     };
 
-    transporter.sendMail(mailOptions, (error, info) => {
-        if (error) {
-            console.log(error);
-        } else {
-            console.log('Email sent: ' + info.response);
-        }
-    });
+    await transporter.sendMail(mailOptions);
+    return true; // Indicate successful email sending
+  } catch (error) {
+    console.error(error);
+    throw new Error('Email could not be sent.');
+  }
 }
+
+export default sendMail;
