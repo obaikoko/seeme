@@ -7,7 +7,7 @@ import {
   getUserProfile,
   updateUserProfile,
   resetPassword,
-  verifyResetPassword,
+  verifyOTP,
 } from '../controllers/userController.js';
 
 const router = express.Router();
@@ -18,6 +18,6 @@ router
   .route('/profile')
   .get(protect, getUserProfile)
   .put(protect, updateUserProfile);
-router.route('/resetPassword').post(resetPassword).put(verifyResetPassword);
+router.route('/resetPassword').post(resetPassword).put(verifyOTP);
 
 export default router;
