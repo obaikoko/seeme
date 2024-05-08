@@ -86,6 +86,14 @@ const getUserProfile = asyncHandler(async (req, res) => {
 // @access Private
 const updateUserProfile = asyncHandler(async (req, res) => {
   const { username, email, password } = req.body;
+
+  // checks if user already exist
+  const emailExist = await User.findOne({ email });
+  if (emailExist) {
+    res.status(400);
+    throw new Error(`${emailExist.email} already exist`);
+  }
+
   const user = await User.findById(req.user._id);
   const sixDigitNumber = generateSixDigitNumber();
   const expirationTime = new Date(Date.now() + 60 * 10 * 1000);
@@ -122,7 +130,7 @@ const updateUserProfile = asyncHandler(async (req, res) => {
     try {
       await sendMail(user.email, subject, text);
       res.status(200);
-      res.json({ message: `Email sent successfully! to ${email}` });
+      res.json({ message: `Email sent successfully! to ${user.email}` });
     } catch (error) {
       res.status(500);
       throw new Error('Email could not be sent.');
@@ -136,7 +144,7 @@ const updateUserProfile = asyncHandler(async (req, res) => {
     try {
       await sendMail(user.email, subject, text);
       res.status(200);
-      res.json({ message: `Email sent successfully! to ${email}` });
+      res.json({ message: `Email sent successfully! to ${user.email}` });
     } catch (error) {
       res.status(500);
       throw new Error('Email could not be sent.');
@@ -150,7 +158,7 @@ const updateUserProfile = asyncHandler(async (req, res) => {
     try {
       await sendMail(user.email, subject, text);
       res.status(200);
-      res.json({ message: `Email sent successfully! to ${email}` });
+      res.json({ message: `Email sent successfully! to ${user.email}` });
     } catch (error) {
       res.status(500);
       throw new Error('Email could not be sent.');
@@ -235,11 +243,12 @@ const verifyResetPassword = asyncHandler(async (req, res) => {
   }
 
   if (
-    newPassword.length < minLength ||
-    !hasUppercase ||
-    !hasLowercase ||
-    !hasDigit ||
-    !hasSpecialChar
+    newPassword &&
+    (newPassword.length < minLength ||
+      !hasUppercase ||
+      !hasLowercase ||
+      !hasDigit ||
+      !hasSpecialChar)
   ) {
     res.status(400);
     throw new Error(
