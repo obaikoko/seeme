@@ -2,6 +2,7 @@ import asyncHandler from 'express-async-handler';
 import User from '../model/userModel.js';
 import generateToken from '../utils/generateToken.js';
 import sendMail from '../utils/sendMail.js';
+
 // @desc Auth user/set token
 // @route POST api/users/auth
 // @access public
@@ -66,6 +67,7 @@ const logoutUser = asyncHandler(async (req, res) => {
   });
   res.status(200).json({ message: 'User Logged out ' });
 });
+
 // @desc Get user Profile
 // @route GET api/users/profile
 // @access Private
@@ -217,8 +219,8 @@ const resetPassword = asyncHandler(async (req, res) => {
 
 // @desc PUT update Password
 // @privacy public
-// @route POST /api/users/resetPassword
-const verifyResetPassword = asyncHandler(async (req, res) => {
+// @route PUT /api/users/verifyOTP
+const verifyOTP = asyncHandler(async (req, res) => {
   const { email, newEmail, otp, newPassword } = req.body;
   const user = await User.findOne({ email });
   const minLength = 8;
@@ -275,5 +277,5 @@ export {
   getUserProfile,
   updateUserProfile,
   resetPassword,
-  verifyResetPassword,
+  verifyOTP,
 };
