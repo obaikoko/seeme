@@ -8,6 +8,7 @@ import {
   updateUserProfile,
   resetPassword,
   verifyResetPassword,
+  addFriendsToGroupCall,
 } from '../controllers/userController.js';
 
 const router = express.Router();
@@ -19,5 +20,8 @@ router
   .get(protect, getUserProfile)
   .put(protect, updateUserProfile);
 router.route('/resetPassword').post(resetPassword).put(verifyResetPassword);
+
+// New route for adding friends to group call (premuim)
+router.post('/add-friends', protect, addFriendsToGroupCall);
 
 export default router;

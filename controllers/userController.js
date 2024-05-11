@@ -259,6 +259,32 @@ const verifyResetPassword = asyncHandler(async (req, res) => {
   res.json({ message: 'Profile updated successfully' });
 });
 
+
+// @desc Add friends to group call
+// @route POST /api/users/add-friends
+// @access Private
+const addFriendsToGroupCall = asyncHandler(async (req, res) => {
+  const { friendsToAdd } = req.body;
+
+  try {
+    const user = await User.findById(req.user._id);
+
+    if (!user) {
+      res.status(404);
+      throw new Error('User not found');
+    }
+
+    // Add new friends to the friendsList array
+    user.friendsList = [...user.friendsList, ...friendsToAdd];
+    await user.save();
+
+    res.status(200).json({ message: 'Friends added to group call successfully', user });
+  } catch (error) {
+    console.error('Error adding friends to group call:', error);
+    res.status(500).json({ message: 'Server error. Failed to add friends to group call.' });
+  }
+});
+
 export {
   authUser,
   registerUser,
@@ -267,4 +293,5 @@ export {
   updateUserProfile,
   resetPassword,
   verifyResetPassword,
+  addFriendsToGroupCall, // Add the new function to exports
 };
