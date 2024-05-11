@@ -1,0 +1,100 @@
+[33mcommit 7b13e426383093790e410f614b90f794dc27ba53[m[33m ([m[1;36mHEAD[m[33m -> [m[1;32mmain[m[33m)[m
+Merge: 8f4e024 135259e
+Author: Prince <princeezeodili@gmail.com>
+Date:   Sat May 11 11:29:05 2024 +0100
+
+    add friends
+
+[33mcommit 8f4e0240f52019bba1c3e875ae7771af9ca6f81d[m
+Author: Prince <princeezeodili@gmail.com>
+Date:   Sat May 11 11:11:51 2024 +0100
+
+    add friends to call
+
+[33mcommit 135259e924d4c080b2733608f05abb836dee9ac7[m[33m ([m[1;31morigin/main[m[33m, [m[1;31morigin/HEAD[m[33m)[m
+Merge: 1109750 ad45a8b
+Author: obaikoko <jesseobinna7@gmail.com>
+Date:   Sat May 11 01:45:39 2024 +0100
+
+    Merge branch 'new-feature'
+
+[33mcommit ad45a8b80667f15cd8812a961121d66189712668[m[33m ([m[1;31morigin/new-feature[m[33m)[m
+Author: obaikoko <jesseobinna7@gmail.com>
+Date:   Sat May 11 01:38:27 2024 +0100
+
+    added google auth
+
+[33mcommit 4ddf591fb6b89abfe463c591dec2f25b87234856[m
+Author: obaikoko <jesseobinna7@gmail.com>
+Date:   Wed May 8 23:57:10 2024 +0100
+
+    updated readme
+
+[33mcommit 1109750482552ac06b07656c7fb02ab9c51204dd[m
+Author: obaikoko <jesseobinna7@gmail.com>
+Date:   Wed May 8 23:20:22 2024 +0100
+
+    initial commit
+
+[33mcommit 3d43f0f8244f8bcffa9527a4b14d00237e68aa36[m
+Author: obaikoko <jesseobinna7@gmail.com>
+Date:   Sat May 4 15:49:05 2024 +0100
+
+    added readMe
+
+[33mcommit e922f922febda0f6b5a35c2392e3274149590908[m
+Merge: 31da31b 210d83b
+Author: obaikoko <jesseobinna7@gmail.com>
+Date:   Sat May 4 15:43:40 2024 +0100
+
+    Merge branch 'Oruchinenye-patch-1' of https://github.com/obaikoko/seeme into new-feature
+
+[33mcommit 31da31b8fe461dc1bf8aece83765c69b1cc03c3b[m
+Author: obaikoko <jesseobinna7@gmail.com>
+Date:   Sat May 4 15:39:12 2024 +0100
+
+    updated api logic
+
+[33mcommit 210d83b66fa3ba8d0f63f69156b6dbba6ad03fb8[m[33m ([m[1;31morigin/Oruchinenye-patch-1[m[33m)[m
+Author: official-Chinny <61993295+Oruchinenye@users.noreply.github.com>
+Date:   Sat May 4 01:31:58 2024 +0100
+
+    Update README.md
+    
+    Introductions to SeeMe social media App.
+
+[33mcommit 2baa9413ea5455c7191a44add8ae8bafedcf99c0[m
+Author: official-Chinny <61993295+Oruchinenye@users.noreply.github.com>
+Date:   Fri May 3 22:52:44 2024 +0100
+
+    Update README.md
+
+[33mcommit 09d6d116501e0d66080eee2e1f74ff0fbeddaa03[m
+Author: official-Chinny <61993295+Oruchinenye@users.noreply.github.com>
+Date:   Fri May 3 22:43:59 2024 +0100
+
+    Update README.md
+
+[33mcommit 3aa58e4af9545cccd6b7473a75f52ec3261ec760[m
+Author: official-Chinny <61993295+Oruchinenye@users.noreply.github.com>
+Date:   Fri May 3 22:12:04 2024 +0100
+
+    asked README.md
+
+[33mcommit ab6c54963e5e592993e12d6608cacc5da6bf22e7[m
+Author: obaikoko <jesseobinna7@gmail.com>
+Date:   Fri May 3 21:51:52 2024 +0100
+
+    updated users APi
+
+[33mcommit 5b58cc3d2d560342621c0b2de86da22af64c3028[m
+Author: obaikoko <jesseobinna7@gmail.com>
+Date:   Thu May 2 01:23:42 2024 +0100
+
+    added user authentication
+
+[33mcommit 44e857b4068b5cbd2ee03d921b84b762597035d6[m
+Author: obaikoko <jesseobinna7@gmail.com>
+Date:   Wed May 1 23:56:12 2024 +0100
+
+    initial commit
