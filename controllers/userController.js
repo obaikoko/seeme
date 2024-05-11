@@ -2,6 +2,7 @@ import asyncHandler from 'express-async-handler';
 import User from '../model/userModel.js';
 import generateToken from '../utils/generateToken.js';
 import sendMail from '../utils/sendMail.js';
+
 // @desc Auth user/set token
 // @route POST api/users/auth
 // @access public
@@ -66,6 +67,7 @@ const logoutUser = asyncHandler(async (req, res) => {
   });
   res.status(200).json({ message: 'User Logged out ' });
 });
+
 // @desc Get user Profile
 // @route GET api/users/profile
 // @access Private
