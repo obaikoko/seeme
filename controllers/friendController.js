@@ -40,41 +40,64 @@ const addFriend = asyncHandler(async (req, res) => {
 
 const updateFriendStatus = asyncHandler(async (req, res) => {
   const { sender, status } = req.body;
-  const user = await User.findById(req.user._id);
-  const request = await FriendRequest.findOne({ sender }).populate(
-    'sender',
-    'username'
-  );
 
-  if (!user) {
-    res.status(404);
-    throw new Error('User not found');
-  }
+  try {
+    const user = await User.findById(req.user._id);
+    const updatSender = await User.findById(sender);
 
-  if (!request) {
-    res.status(404);
-    throw new Error('Request not found');
-  }
-  request.status = status || request.status;
-  const savedRequest = await request.save();
+    if (!user) {
+      res.status(404);
+      throw new Error('User not found');
+    }
 
-  if (savedRequest.status === 'accepted') {
-    user.friends.push(sender);
-    const acceptedFriend = await user.save();
-    res.status(200);
-    res.json(acceptedFriend);
-  } else if (savedRequest.status === 'rejected') {
-    await FriendRequest.findOneAndDelete({ sender });
+    const request = await FriendRequest.findOne({ sender }).populate(
+      'sender',
+      'username'
+    );
+    if (!request) {
+      res.status(404);
+      throw new Error('Request not found');
+    }
 
-    user.friends.pull(sender);
-    const rejectedFriend = await user.save();
-    res.status(200);
-    res.json(rejectedFriend);
-  } else if (savedRequest.status === 'pending') {
-    user.friends.pull(sender);
-    const pendFriend = await user.save();
-    res.status(200);
-    res.json(pendFriend);
+    request.status = status || request.status;
+    const savedRequest = await request.save();
+
+    switch (savedRequest.status) {
+      case 'accepted':
+        const isFriend = user.friends.includes(sender);
+        if (isFriend) {
+          res.status(200).json('Request already accepted');
+        } else {
+          user.friends.push(sender);
+          updatSender.friends.push(req.user._id);
+          await updatSender.save();
+          const acceptedFriend = await user.save();
+          res.status(200).json(acceptedFriend);
+        }
+        break;
+
+      case 'rejected':
+        await FriendRequest.findOneAndDelete({ sender });
+        user.friends.pull(sender);
+        updatSender.friends.pull(req.user._id);
+        await updatSender.save();
+        const rejectedFriend = await user.save();
+        res.status(200).json(rejectedFriend);
+        break;
+
+      case 'pending':
+        updatSender.friends.pull(req.user._id);
+        await updatSender.save();
+        user.friends.pull(sender);
+        const pendingFriend = await user.save();
+        res.status(200).json(pendingFriend);
+        break;
+
+      default:
+        res.status(400).json({ message: 'Invalid status' });
+    }
+  } catch (error) {
+    res.status(500).json({ error: error.message });
   }
 });
 
