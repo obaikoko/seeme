@@ -8,6 +8,7 @@ import GoogleStrategy from 'passport-google-oauth20';
 GoogleStrategy.Strategy;
 import session from 'express-session';
 import userRoutes from './routes/userRoutes.js';
+import friendRoutes from './routes/friendRoute.js';
 import googleAuthRoute from './routes/googleAuthRoute.js';
 import { notFound, errorHandler } from './middleware/errorMiddleware.js';
 import connectDB from './config/db.js';
@@ -18,7 +19,12 @@ const port = process.env.PORT || 5000;
 
 connectDB();
 const app = express();
-app.use(cors());
+const corsOptions = {
+  origin: 'http://localhost:5173',
+  credentials: true,
+};
+
+app.use(cors(corsOptions));
 app.use(cookieParser());
 app.use(express.json());
 app.use(express.urlencoded({ extended: true }));
@@ -38,6 +44,8 @@ app.use(passport.session());
 
 app.use('/api/users', userRoutes);
 app.use('/auth/google', googleAuthRoute);
+app.use('/api/friends', friendRoutes)
+
 
 app.use(notFound);
 app.use(errorHandler);

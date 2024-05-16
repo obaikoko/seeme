@@ -72,13 +72,17 @@ const logoutUser = asyncHandler(async (req, res) => {
 // @route GET api/users/profile
 // @access Private
 const getUserProfile = asyncHandler(async (req, res) => {
-  const user = await User.findById(req.user._id);
+  const user = await User.findById(req.user._id).populate(
+    'friends',
+    'username'
+  );
 
   if (user) {
     res.status(200).json({
       _id: user._id,
       username: user.username,
       email: user.email,
+      friends: user.friends.map((friend) => friend.username),
     });
   }
 });
@@ -222,7 +226,7 @@ const resetPassword = asyncHandler(async (req, res) => {
 // @route PUT /api/users/verifyOTP
 const verifyOTP = asyncHandler(async (req, res) => {
   const { email, newEmail, otp, newPassword } = req.body;
-  const user = await User.findOne({ email });
+  const user = await User.findById({ email });
   const minLength = 8;
   const hasUppercase = /[A-Z]/.test(newPassword);
   const hasLowercase = /[a-z]/.test(newPassword);
