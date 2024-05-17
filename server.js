@@ -20,7 +20,7 @@ const port = process.env.PORT || 5000;
 connectDB();
 const app = express();
 const corsOptions = {
-  origin: 'http://localhost:5173',
+  origin: 'https://see-me-x7dk.vercel.app',
   credentials: true,
 };
 
@@ -44,8 +44,7 @@ app.use(passport.session());
 
 app.use('/api/users', userRoutes);
 app.use('/auth/google', googleAuthRoute);
-app.use('/api/friends', friendRoutes)
-
+app.use('/api/friends', friendRoutes);
 
 app.use(notFound);
 app.use(errorHandler);
