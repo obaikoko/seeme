@@ -19,11 +19,18 @@ const port = process.env.PORT || 5000;
 
 connectDB();
 const app = express();
-const corsOptions = {
-  // origin: 'https://see-me-x7dk.vercel.app',
-  origin: 'http://localhost:5173',
-  credentials: true,
-};
+
+if (process.env.NODE_ENV === 'development') {
+  const corsOptions = {
+    origin: 'http://localhost:3000',
+    credentials: true,
+  };
+} else {
+  const corsOptions = {
+    origin: 'https://seemegrp7.vercel.app/',
+    credentials: true,
+  };
+}
 
 app.use(cors(corsOptions));
 app.use(cookieParser());
