@@ -81,6 +81,7 @@ const getUserProfile = asyncHandler(async (req, res) => {
     res.status(200).json({
       _id: user._id,
       username: user.username,
+      image: user.image.url,
       email: user.email,
       friends: user.friends.map((friend) => friend.username),
     });
@@ -91,7 +92,7 @@ const getUserProfile = asyncHandler(async (req, res) => {
 // @route PUT api/users/profile
 // @access Private
 const updateUserProfile = asyncHandler(async (req, res) => {
-  const { username, email, password } = req.body;
+  const { username, image, email, password } = req.body;
 
   // checks if user already exist
   const emailExist = await User.findOne({ email });
@@ -120,11 +121,13 @@ const updateUserProfile = asyncHandler(async (req, res) => {
 
   if (username && !email && !password) {
     user.username = username || user.username;
+    user.image = image || user.image;
     const updatedUser = await user.save();
     res.status(200);
     res.json({
       _id: updatedUser._id,
       username: updatedUser.username,
+      image: updatedUser.image.url,
       email: updatedUser.email,
     });
   }

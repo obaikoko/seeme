@@ -13,7 +13,12 @@ const userSchema = mongoose.Schema(
       unique: true,
     },
     image: {
-      type: String,
+      publicId: {
+        type: String,
+      },
+      url: {
+        type: String,
+      },
     },
     password: {
       type: String,
