@@ -20,7 +20,7 @@ const userSchema = mongoose.Schema(
       url: {
         type: String,
         default:
-          'https://res.cloudinary.com/duz7maquu/image/upload/v1716037111/SeeMe/Ellipse_6_mkpxi8.png',
+          'https://res.cloudinary.com/dzajrh9z7/image/upload/v1716123883/SeeMe/omgwiw9mcp0e91lanaic.jpg',
       },
     },
     password: {

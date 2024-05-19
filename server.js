@@ -28,7 +28,7 @@ if (process.env.NODE_ENV === 'development') {
   app.use(cors(corsOptions));
 } else {
   const corsOptions = {
-    origin: 'https://see-megrp7.vercel.app',
+    origin: 'http://localhost:3000',
     credentials: true,
   };
   app.use(cors(corsOptions));
