@@ -103,7 +103,13 @@ const updateFriendStatus = asyncHandler(async (req, res) => {
 
 const getUserFriends = asyncHandler(async (req, res) => {
   const friends = await FriendRequest.find({ recipient: req.user._id });
-  console.log(friends);
+  if (friends) {
+    res.status(200);
+    res.json(friends);
+  } else {
+    res.status(200);
+    res.json('No friends yet');
+  }
 });
 
 export { addFriend, updateFriendStatus, getUserFriends };
