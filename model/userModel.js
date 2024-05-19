@@ -15,9 +15,12 @@ const userSchema = mongoose.Schema(
     image: {
       publicId: {
         type: String,
+        default: '',
       },
       url: {
         type: String,
+        default:
+          'https://res.cloudinary.com/duz7maquu/image/upload/v1716037111/SeeMe/Ellipse_6_mkpxi8.png',
       },
     },
     password: {

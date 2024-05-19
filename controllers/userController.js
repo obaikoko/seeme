@@ -2,6 +2,7 @@ import asyncHandler from 'express-async-handler';
 import User from '../model/userModel.js';
 import generateToken from '../utils/generateToken.js';
 import sendMail from '../utils/sendMail.js';
+import cloudinary from '../config/cloudinary.js';
 
 // @desc Auth user/set token
 // @route POST api/users/auth
@@ -19,6 +20,7 @@ const authUser = asyncHandler(async (req, res) => {
     res.status(200).json({
       _id: user._id,
       username: user.username,
+      image: user.image.url,
       email: user.email,
     });
   } else {
@@ -49,6 +51,7 @@ const registerUser = asyncHandler(async (req, res) => {
     res.status(200).json({
       _id: user._id,
       username: user.username,
+      image: user.image.url,
       email: user.email,
     });
   } else {
@@ -88,97 +91,145 @@ const getUserProfile = asyncHandler(async (req, res) => {
   }
 });
 
+// @description This is to get all users
+// @Route GET /api/users
+// privacy Private
+const getUsers = asyncHandler(async (req, res) => {
+  const users = await User.find({});
+  res.json(users);
+});
+
 // @desc Update user Profile
 // @route PUT api/users/profile
 // @access Private
 const updateUserProfile = asyncHandler(async (req, res) => {
-  const { username, image, email, password } = req.body;
+  const { username, image, password } = req.body;
 
   // checks if user already exist
-  const emailExist = await User.findOne({ email });
-  if (emailExist) {
-    res.status(400);
-    throw new Error(`${emailExist.email} already exist`);
-  }
+  // const emailExist = await User.findOne({ email });
+  // if (emailExist) {
+  //   res.status(400);
+  //   throw new Error(`${emailExist.email} already exist`);
+  // }
 
   const user = await User.findById(req.user._id);
-  const sixDigitNumber = generateSixDigitNumber();
-  const expirationTime = new Date(Date.now() + 60 * 10 * 1000);
-  const currentTime = new Date();
-  const timeDifferenceInMilliseconds = expirationTime - currentTime;
-  const timeDifferenceInMinutes = Math.ceil(
-    timeDifferenceInMilliseconds / (1000 * 60)
+  // const sixDigitNumber = generateSixDigitNumber();
+  // const expirationTime = new Date(Date.now() + 60 * 10 * 1000);
+  // const currentTime = new Date();
+  // const timeDifferenceInMilliseconds = expirationTime - currentTime;
+  // const timeDifferenceInMinutes = Math.ceil(
+  //   timeDifferenceInMilliseconds / (1000 * 60)
+  // );
+
+  const existingImageId = user?.image?.publicId || '';
+
+  const newImageId = existingImageId.substring(
+    existingImageId.indexOf('seeMe') + 'seeMe/'.length
   );
 
-  user.resetNumber = sixDigitNumber;
-  user.resetNumberExpires = expirationTime;
-  await user.save();
+  const uploadedResponse = await cloudinary.uploader.upload(image, {
+    folder: 'seeMe',
+    public_id: newImageId,
+    transformation: [{ width: 640, height: 510, crop: 'scale' }],
+  });
+
+  // user.resetNumber = sixDigitNumber;
+  // user.resetNumberExpires = expirationTime;
+  // await user.save();
 
   if (!user) {
     res.status(404);
     throw new Error('User Not Found');
   }
+  user.username = username || user.username;
+  user.image =
+    {
+      url: uploadedResponse.url,
+      publicId: uploadedResponse.public_id,
+    } ||
+    user.image ||
+    user.image;
+  user.password = password || user.password;
 
-  if (username && !email && !password) {
-    user.username = username || user.username;
-    user.image = image || user.image;
-    const updatedUser = await user.save();
+  const updatedUser = await user.save();
     res.status(200);
     res.json({
       _id: updatedUser._id,
       username: updatedUser.username,
-      image: updatedUser.image.url,
+      image: {
+        url: uploadedResponse.url,
+        publicId: uploadedResponse.public_id,
+      },
       email: updatedUser.email,
     });
-  }
 
-  if (email && !password) {
-    const subject = 'REQUEST FOR CHANGE OF EMAIL';
-    const text = `A request has been made to change email address from ${user.email} to ${email} if you did not request for the change ignore else here is your on time password ${sixDigitNumber} which expires in ${timeDifferenceInMinutes} minutes `;
+  // if (username && !email && !password) {
+  //   user.username = username || user.username;
+  //   user.image =
+  //     {
+  //       url: uploadedResponse.url,
+  //       publicId: uploadedResponse.public_id,
+  //     } || user.image;
+  //   const updatedUser = await user.save();
+  //   res.status(200);
+  //   res.json({
+  //     _id: updatedUser._id,
+  //     username: updatedUser.username,
+  //     image: {
+  //       url: uploadedResponse.url,
+  //       publicId: uploadedResponse.public_id,
+  //     },
+  //     email: updatedUser.email,
+  //   });
+  // }
 
-    try {
-      await sendMail(user.email, subject, text);
-      res.status(200);
-      res.json({ message: `Email sent successfully! to ${user.email}` });
-    } catch (error) {
-      res.status(500);
-      throw new Error('Email could not be sent.');
-    }
-  }
+  // if (email && !password) {
+  //   const subject = 'REQUEST FOR CHANGE OF EMAIL';
+  //   const text = `A request has been made to change email address from ${user.email} to ${email} if you did not request for the change ignore else here is your on time password ${sixDigitNumber} which expires in ${timeDifferenceInMinutes} minutes `;
 
-  if (!email && password) {
-    const subject = 'REQUEST FOR CHANGE OF PASSWORD';
-    const text = `A request for change of password has been made, if you did not request for the change ignore else here is your on time password ${sixDigitNumber} which expires in ${timeDifferenceInMinutes} minutes `;
+  //   try {
+  //     await sendMail(user.email, subject, text);
+  //     res.status(200);
+  //     res.json({ message: `Email sent successfully! to ${user.email}` });
+  //   } catch (error) {
+  //     res.status(500);
+  //     throw new Error('Email could not be sent.');
+  //   }
+  // }
 
-    try {
-      await sendMail(user.email, subject, text);
-      res.status(200);
-      res.json({ message: `Email sent successfully! to ${user.email}` });
-    } catch (error) {
-      res.status(500);
-      throw new Error('Email could not be sent.');
-    }
-  }
+  // if (!email && password) {
+  //   const subject = 'REQUEST FOR CHANGE OF PASSWORD';
+  //   const text = `A request for change of password has been made, if you did not request for the change ignore else here is your on time password ${sixDigitNumber} which expires in ${timeDifferenceInMinutes} minutes `;
 
-  if (email && password) {
-    const subject = 'REQUEST FOR CHANGE OF EMAIL AND PASSWORD';
-    const text = `A request for change of email from ${user.email} to ${email}  and change of password has been made,  if you did not request for the change ignore else here is your on time password ${sixDigitNumber} which expires in ${timeDifferenceInMinutes} minutes `;
+  //   try {
+  //     await sendMail(user.email, subject, text);
+  //     res.status(200);
+  //     res.json({ message: `Email sent successfully! to ${user.email}` });
+  //   } catch (error) {
+  //     res.status(500);
+  //     throw new Error('Email could not be sent.');
+  //   }
+  // }
 
-    try {
-      await sendMail(user.email, subject, text);
-      res.status(200);
-      res.json({ message: `Email sent successfully! to ${user.email}` });
-    } catch (error) {
-      res.status(500);
-      throw new Error('Email could not be sent.');
-    }
-  }
+  // if (email && password) {
+  //   const subject = 'REQUEST FOR CHANGE OF EMAIL AND PASSWORD';
+  //   const text = `A request for change of email from ${user.email} to ${email}  and change of password has been made,  if you did not request for the change ignore else here is your on time password ${sixDigitNumber} which expires in ${timeDifferenceInMinutes} minutes `;
 
-  function generateSixDigitNumber() {
-    const min = 100000; // Minimum 6-digit number
-    const max = 999999; // Maximum 6-digit number
-    return Math.floor(Math.random() * (max - min + 1)) + min;
-  }
+  //   try {
+  //     await sendMail(user.email, subject, text);
+  //     res.status(200);
+  //     res.json({ message: `Email sent successfully! to ${user.email}` });
+  //   } catch (error) {
+  //     res.status(500);
+  //     throw new Error('Email could not be sent.');
+  //   }
+  // }
+
+  // function generateSixDigitNumber() {
+  //   const min = 100000; // Minimum 6-digit number
+  //   const max = 999999; // Maximum 6-digit number
+  //   return Math.floor(Math.random() * (max - min + 1)) + min;
+  // }
 });
 
 // @desc POST update Password
@@ -282,6 +333,7 @@ export {
   registerUser,
   logoutUser,
   getUserProfile,
+  getUsers,
   updateUserProfile,
   resetPassword,
   verifyOTP,
