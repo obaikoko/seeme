@@ -101,4 +101,9 @@ const updateFriendStatus = asyncHandler(async (req, res) => {
   }
 });
 
-export { addFriend, updateFriendStatus };
+const getUserFriends = asyncHandler(async (req, res) => {
+  const friends = await FriendRequest.find({ recipient: req.user._id });
+  console.log(friends);
+});
+
+export { addFriend, updateFriendStatus, getUserFriends };
