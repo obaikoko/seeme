@@ -74,9 +74,9 @@ const updateFriendStatus = asyncHandler(async (req, res) => {
     await FriendRequest.findOneAndDelete({ sender });
 
     user.friends.pull(sender);
-    const rejectedFriend = await user.save();
+    await user.save();
     res.status(200);
-    res.json(rejectedFriend);
+    res.json('Request rejected');
   } else if (savedRequest.status === 'pending') {
     user.friends.pull(sender);
     const pendFriend = await user.save();
@@ -86,7 +86,9 @@ const updateFriendStatus = asyncHandler(async (req, res) => {
 });
 
 const getUserFriends = asyncHandler(async (req, res) => {
-  const friends = await FriendRequest.find({ recipient: req.user._id });
+  const friends = await FriendRequest.find({
+    recipient: req.user._id,
+  }).populate('sender', 'username image');
   if (friends) {
     res.status(200);
     res.json(friends);
