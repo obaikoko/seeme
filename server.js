@@ -14,11 +14,16 @@ import { notFound, errorHandler } from './middleware/errorMiddleware.js';
 import connectDB from './config/db.js';
 import User from './model/userModel.js';
 import configureGoogleStrategy from './config/googleAuth.js';
+import http from 'http'; // Add this import
+import { Server } from 'socket.io'; // Add this import
+
 dotenv.config();
 const port = process.env.PORT || 5000;
 
 connectDB();
 const app = express();
+const server = http.createServer(app); // Create a server instance
+const io = new Server(server, { cors: { origin: '*' } }); // Create a Socket.IO server
 
 if (process.env.NODE_ENV === 'development') {
   const corsOptions = {
@@ -58,4 +63,24 @@ app.use('/api/friends', friendRoutes);
 
 app.use(notFound);
 app.use(errorHandler);
-app.listen(port, () => console.log(`server started on ${port}`));
+
+// Socket.IO signaling logic
+io.on('connection', (socket) => {
+  console.log('a user connected');
+
+  socket.on('join', (roomId) => {
+    socket.join(roomId);
+    console.log(`User joined room: ${roomId}`);
+  });
+
+  socket.on('signal', (data) => {
+    const { roomId, signalData } = data;
+    socket.to(roomId).emit('signal', signalData);
+  });
+
+  socket.on('disconnect', () => {
+    console.log('user disconnected');
+  });
+});
+
+server.listen(port, () => console.log(`server started on ${port}`));
