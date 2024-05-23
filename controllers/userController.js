@@ -261,7 +261,9 @@ const resetPassword = asyncHandler(async (req, res) => {
 
     try {
       await sendMail(email, subject, text);
-      res.status(200).json(user);
+      res
+        .status(200)
+        .json({ email: user.email, username: user.username, _id: user._id });
     } catch (error) {
       res.status(500);
       throw new Error('Email could not be sent.');
