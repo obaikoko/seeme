@@ -104,132 +104,55 @@ const getUsers = asyncHandler(async (req, res) => {
 // @access Private
 const updateUserProfile = asyncHandler(async (req, res) => {
   const { username, image, password } = req.body;
-
-  // checks if user already exist
-  // const emailExist = await User.findOne({ email });
-  // if (emailExist) {
-  //   res.status(400);
-  //   throw new Error(`${emailExist.email} already exist`);
-  // }
-
   const user = await User.findById(req.user._id);
-  // const sixDigitNumber = generateSixDigitNumber();
-  // const expirationTime = new Date(Date.now() + 60 * 10 * 1000);
-  // const currentTime = new Date();
-  // const timeDifferenceInMilliseconds = expirationTime - currentTime;
-  // const timeDifferenceInMinutes = Math.ceil(
-  //   timeDifferenceInMilliseconds / (1000 * 60)
-  // );
-
-  const existingImageId = user?.image?.publicId || '';
-
-  const newImageId = existingImageId.substring(
-    existingImageId.indexOf('seeMe') + 'seeMe/'.length
-  );
-
-  const uploadedResponse = await cloudinary.uploader.upload(image, {
-    folder: 'seeMe',
-    public_id: newImageId,
-    transformation: [{ width: 640, height: 510, crop: 'scale' }],
-  });
-
-  // user.resetNumber = sixDigitNumber;
-  // user.resetNumberExpires = expirationTime;
-  // await user.save();
-
   if (!user) {
     res.status(404);
     throw new Error('User Not Found');
   }
-  user.username = username || user.username;
-  user.image =
-    {
-      url: uploadedResponse.url,
-      publicId: uploadedResponse.public_id,
-    } ||
-    user.image ||
-    user.image;
-  user.password = password || user.password;
 
-  const updatedUser = await user.save();
-  res.status(200);
-  res.json({
-    _id: updatedUser._id,
-    username: updatedUser.username,
-    image: {
-      url: uploadedResponse.url,
-      publicId: uploadedResponse.public_id,
-    },
-    email: updatedUser.email,
-  });
+  if (!image) {
+    user.username = username || user.username;
+    user.password = password || user.password;
+    const updatedUser = await user.save();
+    res.status(200);
+    res.json({
+      _id: updatedUser._id,
+      username: updatedUser.username,
+      email: updatedUser.email,
+    });
+  } else {
+    const existingImageId = user?.image?.publicId || '';
 
-  // if (username && !email && !password) {
-  //   user.username = username || user.username;
-  //   user.image =
-  //     {
-  //       url: uploadedResponse.url,
-  //       publicId: uploadedResponse.public_id,
-  //     } || user.image;
-  //   const updatedUser = await user.save();
-  //   res.status(200);
-  //   res.json({
-  //     _id: updatedUser._id,
-  //     username: updatedUser.username,
-  //     image: {
-  //       url: uploadedResponse.url,
-  //       publicId: uploadedResponse.public_id,
-  //     },
-  //     email: updatedUser.email,
-  //   });
-  // }
+    const newImageId = existingImageId.substring(
+      existingImageId.indexOf('seeMe') + 'seeMe/'.length
+    );
 
-  // if (email && !password) {
-  //   const subject = 'REQUEST FOR CHANGE OF EMAIL';
-  //   const text = `A request has been made to change email address from ${user.email} to ${email} if you did not request for the change ignore else here is your on time password ${sixDigitNumber} which expires in ${timeDifferenceInMinutes} minutes `;
+    const uploadedResponse = await cloudinary.uploader.upload(image, {
+      folder: 'seeMe',
+      public_id: newImageId,
+      transformation: [{ width: 640, height: 510, crop: 'scale' }],
+    });
 
-  //   try {
-  //     await sendMail(user.email, subject, text);
-  //     res.status(200);
-  //     res.json({ message: `Email sent successfully! to ${user.email}` });
-  //   } catch (error) {
-  //     res.status(500);
-  //     throw new Error('Email could not be sent.');
-  //   }
-  // }
-
-  // if (!email && password) {
-  //   const subject = 'REQUEST FOR CHANGE OF PASSWORD';
-  //   const text = `A request for change of password has been made, if you did not request for the change ignore else here is your on time password ${sixDigitNumber} which expires in ${timeDifferenceInMinutes} minutes `;
-
-  //   try {
-  //     await sendMail(user.email, subject, text);
-  //     res.status(200);
-  //     res.json({ message: `Email sent successfully! to ${user.email}` });
-  //   } catch (error) {
-  //     res.status(500);
-  //     throw new Error('Email could not be sent.');
-  //   }
-  // }
-
-  // if (email && password) {
-  //   const subject = 'REQUEST FOR CHANGE OF EMAIL AND PASSWORD';
-  //   const text = `A request for change of email from ${user.email} to ${email}  and change of password has been made,  if you did not request for the change ignore else here is your on time password ${sixDigitNumber} which expires in ${timeDifferenceInMinutes} minutes `;
-
-  //   try {
-  //     await sendMail(user.email, subject, text);
-  //     res.status(200);
-  //     res.json({ message: `Email sent successfully! to ${user.email}` });
-  //   } catch (error) {
-  //     res.status(500);
-  //     throw new Error('Email could not be sent.');
-  //   }
-  // }
-
-  // function generateSixDigitNumber() {
-  //   const min = 100000; // Minimum 6-digit number
-  //   const max = 999999; // Maximum 6-digit number
-  //   return Math.floor(Math.random() * (max - min + 1)) + min;
-  // }
+    user.username = username || user.username;
+    user.image =
+      {
+        url: uploadedResponse.url,
+        publicId: uploadedResponse.public_id,
+      } ||
+      user.image ||
+      user.image;
+    const updatedUser = await user.save();
+    res.status(200);
+    res.json({
+      _id: updatedUser._id,
+      username: updatedUser.username,
+      image: {
+        url: uploadedResponse.url,
+        publicId: uploadedResponse.public_id,
+      },
+      email: updatedUser.email,
+    });
+  }
 });
 
 // @desc POST update Password
