@@ -282,7 +282,7 @@ const resetPassword = asyncHandler(async (req, res) => {
 // @route PUT /api/users/verifyOTP
 const verifyOTP = asyncHandler(async (req, res) => {
   const { email, newEmail, otp, newPassword } = req.body;
-  const user = await User.findById({ email });
+  const user = await User.findOne({ email });
   const minLength = 8;
   const hasUppercase = /[A-Z]/.test(newPassword);
   const hasLowercase = /[a-z]/.test(newPassword);
