@@ -14,16 +14,16 @@ import { notFound, errorHandler } from './middleware/errorMiddleware.js';
 import connectDB from './config/db.js';
 import User from './model/userModel.js';
 import configureGoogleStrategy from './config/googleAuth.js';
-import http from 'http'; // Add this import
-import { Server } from 'socket.io'; // Add this import
+import http from 'http';
+import { Server } from 'socket.io';
 
 dotenv.config();
 const port = process.env.PORT || 5000;
 
 connectDB();
 const app = express();
-const server = http.createServer(app); // Create a server instance
-const io = new Server(server, { cors: { origin: '*' } }); // Create a Socket.IO server
+const server = http.createServer(app);
+const io = new Server(server, { cors: { origin: '*' } });
 
 if (process.env.NODE_ENV === 'development') {
   const corsOptions = {

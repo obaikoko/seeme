@@ -152,16 +152,16 @@ const updateUserProfile = asyncHandler(async (req, res) => {
   user.password = password || user.password;
 
   const updatedUser = await user.save();
-    res.status(200);
-    res.json({
-      _id: updatedUser._id,
-      username: updatedUser.username,
-      image: {
-        url: uploadedResponse.url,
-        publicId: uploadedResponse.public_id,
-      },
-      email: updatedUser.email,
-    });
+  res.status(200);
+  res.json({
+    _id: updatedUser._id,
+    username: updatedUser.username,
+    image: {
+      url: uploadedResponse.url,
+      publicId: uploadedResponse.public_id,
+    },
+    email: updatedUser.email,
+  });
 
   // if (username && !email && !password) {
   //   user.username = username || user.username;
@@ -261,7 +261,7 @@ const resetPassword = asyncHandler(async (req, res) => {
 
     try {
       await sendMail(email, subject, text);
-      res.status(200).json({ message: `Email sent successfully! to ${email}` });
+      res.status(200).json(user);
     } catch (error) {
       res.status(500);
       throw new Error('Email could not be sent.');
